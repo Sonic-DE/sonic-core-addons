@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.29)
 
-set(KF_VERSION "6.29.0") # handled by release scripts
+set(KF_VERSION "6.25.0") # handled by release scripts
 project(KCoreAddons VERSION ${KF_VERSION})
 
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 include(FeatureSummary)
-find_package(ECM 6.28.0 NO_MODULE)
+find_package(ECM 6.25.0 NO_MODULE)
 set_package_properties(ECM PROPERTIES TYPE REQUIRED DESCRIPTION "Extra CMake Modules." URL "https://commits.kde.org/extra-cmake-modules")
 feature_summary(WHAT REQUIRED_PACKAGES_NOT_FOUND FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
@@ -72,11 +69,6 @@ if(ENABLE_INOTIFY)
     endif()
 else()
     set(HAVE_SYS_INOTIFY_H FALSE)
-endif()
-
-if (CMAKE_SYSTEM_NAME MATCHES "Linux")
-    find_package(LibMount REQUIRED)
-    set(HAVE_LIB_MOUNT ${LibMount_FOUND})
 endif()
 
 set(HAVE_PROCSTAT FALSE)
@@ -196,6 +188,4 @@ endif()
 include(ECMFeatureSummary)
 ecm_feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)
 
-file(GLOB_RECURSE ALL_CLANG_FORMAT_SOURCE_FILES *.cpp *.h)
-list(FILTER ALL_CLANG_FORMAT_SOURCE_FILES EXCLUDE REGEX ".*\\.ccls-cache/.*")
 kde_configure_git_pre_commit_hook(CHECKS CLANG_FORMAT)
