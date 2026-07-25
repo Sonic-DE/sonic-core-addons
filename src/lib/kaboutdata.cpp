@@ -1533,12 +1533,12 @@ struct {
 
 KAboutData KAboutData::fromAppStreamFile(const QString &appStreamFileName)
 {
-    KAboutData *aboutData = s_registry->m_appData;
-    if (!aboutData) {
-        aboutData = new KAboutData(QCoreApplication::applicationName(), QString(), QString());
-        aboutData->setBugAddress(QByteArray());
-        s_registry->m_appData = aboutData;
-    }
+    // Start from the application data, but fill in a copy: writing to the application data here
+    // would change the application identity behind the caller's back. In particular a <provides>
+    // entry overwrites the component name, which the next setApplicationData() call then pushes
+    // into QCoreApplication::applicationName().
+    KAboutData result = KAboutData::applicationData();
+    KAboutData *aboutData = &result;
 
     QFile appStreamFile(appStreamFileName);
     if (appStreamFile.fileName().isEmpty() || !appStreamFile.open(QFile::ReadOnly)) {

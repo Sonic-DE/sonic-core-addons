@@ -47,6 +47,7 @@ private Q_SLOTS:
     void testProductName();
     void testAppStream();
     void testAppStreamLocalized();
+    void testAppStreamKeepsApplicationData();
 };
 
 static const char AppName[] = "app";
@@ -469,6 +470,19 @@ void KAboutDataTest::testAppStreamLocalized()
     QCOMPARE(
         aboutData.releases()[1].untranslatedDescription(),
         "<p>&quot;Cool&quot; (untranslated) Features:</p><ul><li><em>Important</em> untranslated feature release change 1.</li><li>Not so <em>important</em> untranslated feature release change 2.</li><li>Feature release change 3.</li></ul>"_L1);
+}
+
+// Reading AppStream data must not modify the application data, in particular not its
+// component name, which QCoreApplication::applicationName() is kept in sync with.
+void KAboutDataTest::testAppStreamKeepsApplicationData()
+{
+    KAboutData::setApplicationData(KAboutData(u"myapp"_s, u"My App"_s));
+    QCOMPARE(QCoreApplication::applicationName(), "myapp"_L1);
+
+    std::ignore = KAboutData::fromAppStreamFile(QFINDTESTDATA("data/org.kde.coreaddons.test-app.xml"_L1));
+
+    QCOMPARE(KAboutData::applicationData().componentName(), "myapp"_L1);
+    QCOMPARE(QCoreApplication::applicationName(), "myapp"_L1);
 }
 
 QTEST_MAIN(KAboutDataTest)
