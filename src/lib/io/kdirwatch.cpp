@@ -103,8 +103,10 @@ static KDirWatch::Method methodFromString(const QByteArray &method)
 #if HAVE_SYS_INOTIFY_H
         // inotify supports delete+recreate+modify, which QFSWatch doesn't support
         return KDirWatch::INotify;
-#else
+#elif HAVE_QFILESYSTEMWATCHER
         return KDirWatch::QFSWatch;
+#else
+        return KDirWatch::Stat;
 #endif
     }
 }
@@ -180,7 +182,7 @@ KDirWatchPrivate::KDirWatchPrivate()
     m_nfsPollInterval = qEnvironmentVariableIsSet(s_envNfsPoll) ? qEnvironmentVariableIntValue(s_envNfsPoll) : 5000;
     m_PollInterval = qEnvironmentVariableIsSet(s_envPoll) ? qEnvironmentVariableIntValue(s_envPoll) : 500;
 
-    m_preferredMethod = methodFromString(qEnvironmentVariableIsSet(s_envMethod) ? qgetenv(s_envMethod) : "inotify");
+    m_preferredMethod = methodFromString(qEnvironmentVariableIsSet(s_envMethod) ? qgetenv(s_envMethod) : "default");
     // The nfs method defaults to the normal (local) method
     m_nfsPreferredMethod = methodFromString(qEnvironmentVariableIsSet(s_envNfsMethod) ? qgetenv(s_envNfsMethod) : "Stat");
 
